@@ -7,13 +7,14 @@ class Game{
     constructor(){
         this.score = 0;
         this.highScore = 0;
-        this.nPlat = 10;
+        this.nPlat = 15;
         this.platforms = [];
         this.player;
         this.playerColor = '#FF00AA';
         this.platSpacing = [70,50];
         this.gameState = 'playing' // playing, death, deathScreen
         // this.input = new InputHandler();
+        this.platUnderPlayer = 4;
         
         document.addEventListener('keydown', event => {
             if (event.code === 'Space'){
@@ -30,7 +31,11 @@ class Game{
         //make platforms
         this.platforms = [];
         for(let i = 0; i < this.nPlat; i++){
-            this.addPlatform(i);
+            if(i < this.platUnderPlayer){
+                this.platforms.push(null);
+            }else{
+                this.addPlatform(i);
+            }
         }
         this.score = 0;
         this.player = new Player();
@@ -63,9 +68,11 @@ class Game{
 
     drawStairs(){
         this.platforms.forEach((p,i) => {
-            p.draw(
-                (canvas.width/2)+(this.platSpacing[0]*(p.num-this.player.position[0])),
-                 600+(this.platSpacing[1]*(-i+this.player.position[1])));
+            if(p != null){
+                p.draw(
+                    (canvas.width/2)+(this.platSpacing[0]*(p.num-this.player.position[0])),
+                    600+(this.platSpacing[1]*(-i+this.player.position[1]+this.platUnderPlayer)));   
+            }
         });
     }
 
@@ -81,7 +88,7 @@ class Game{
 
     addPlatform(i){
         let lr = randomOneOrMinusOne();
-        this.platforms.push(new Platform(lr, i==0?0:this.platforms[i-1].num+lr));
+        this.platforms.push(new Platform(lr, i<this.platUnderPlayer+1?0:this.platforms[i-1].num+lr));
     }
 
     handleSpace(){
@@ -104,7 +111,7 @@ class Game{
     }
     
     checkDeath(){
-        if(this.player.position[0]!=this.platforms[0].num){
+        if(this.player.position[0]!=this.platforms[this.platUnderPlayer].num){
             console.log('dead!');
             this.gameState = 'death';
             console.log('game over!');
