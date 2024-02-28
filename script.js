@@ -107,7 +107,6 @@ class Game{
     handleCtrl(){
         this.player.direction *= -1;
         this.handleSpace();
-        this.checkDeath();
     }
     
     checkDeath(){
