@@ -105,7 +105,9 @@ class Game{
             this.addPlatform(this.nPlat-1);
             this.checkDeath();
         }else if(this.gameState == 'deathScreen'){
-            this.highScore = this.score;
+            if(this.score > this.highScore){
+                this.highScore = this.score;
+            }
             this.init();
         }else{
 
@@ -137,14 +139,7 @@ class Game{
     }
 
     deathScreen(){
-        let w = 500;
-        let h = 300;
         bg();
-        // c.fillStyle = '#000000cc';
-        // c.rect((canvas.width/2)-(w/2), (canvas.height/2)-(h/2), w,h);
-        // c.fill();
-        // c.strokeStyle = '#FFFFFFcc';
-        // c.stroke();
         c.fillStyle = '#ffffff';
         c.font = '40px sans-serif';
         c.fillText("Game Over!", canvas.width/2, 200);
@@ -161,8 +156,6 @@ class Game{
             c.fillText(`${this.highScore}`, canvas.width/2, 440);
         }
         c.fillText("Press Space to Try Again", canvas.width/2, 600);
-
-        // c.fillText();
     }
 
 }
