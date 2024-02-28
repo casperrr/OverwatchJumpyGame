@@ -196,6 +196,11 @@ class Player{
         c.beginPath();
         c.ellipse(eyePos[0]+eyeOffSet[0],eyePos[1]+eyeOffSet[1], 5, 5, 0,0,Math.PI*2);
         c.fill();
+        c.fillStyle = '#eeeeee';
+        c.beginPath();
+        c.ellipse(eyePos[0]+eyeOffSet[0]+this.direction,eyePos[1]+eyeOffSet[1]-1, 1, 1, 0,0,Math.PI*2);
+        c.fill();
+        
 
     }
 
