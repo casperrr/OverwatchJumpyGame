@@ -6,7 +6,8 @@ canvas.height = 800;
 class Game{
     constructor(){
         this.score = 0;
-        this.highScore = 0;
+        let storedHighScore = localStorage.getItem('highScore'); 
+        this.highScore = storedHighScore == null?0:storedHighScore;
         this.nPlat = 15;
         this.platforms = [];
         this.player;
@@ -79,11 +80,16 @@ class Game{
     drawScore(){
         let x = canvas.width/2;
         let y = 100;
-        c.font = '30px sans-serif';
+        // Score
+        c.font = '25px sans-serif';
         c.textAlign = "center";
+        c.fillStyle = this.score > this.highScore?'#ff7777':'#ffffff';
+        c.fillText(`Score:`, 100, y);
+        c.fillText(`${this.score}`, 100, y+30);
+        // High Score
         c.fillStyle = '#ffffff';
-        c.fillText(`Score:\n ${this.score}`, x, y);
-
+        c.fillText("High Score:", canvas.width-100, y);
+        c.fillText(`${this.highScore}`, canvas.width-100,y+30);
     }
 
     addPlatform(i){
@@ -99,6 +105,7 @@ class Game{
             this.addPlatform(this.nPlat-1);
             this.checkDeath();
         }else if(this.gameState == 'deathScreen'){
+            this.highScore = this.score;
             this.init();
         }else{
 
@@ -145,12 +152,14 @@ class Game{
         c.fillText(`Score:`, canvas.width/2, 300);
         c.fillText(`${this.score}`, canvas.width/2, 340);
         if(this.score > this.highScore){
-            this.highScore = this.score;
+            // this.highScore = this.score;
+            localStorage.setItem('highScore', this.score);
             c.fillText("New High Score!:", canvas.width/2, 400);
+            c.fillText(`${this.score}`, canvas.width/2, 440);
         }else{
             c.fillText("High Score:", canvas.width/2, 400);
+            c.fillText(`${this.highScore}`, canvas.width/2, 440);
         }
-        c.fillText(`${this.highScore}`, canvas.width/2, 440);
         c.fillText("Press Space to Try Again", canvas.width/2, 600);
 
         // c.fillText();
