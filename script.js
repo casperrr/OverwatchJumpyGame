@@ -6,13 +6,14 @@ canvas.height = 800;
 class Game{
     constructor(){
         this.score = 0;
+        this.highScore = 0;
         this.nPlat = 10;
         this.platforms = [];
         this.player;
         this.playerColor = '#FF00AA';
         this.platSpacing = [70,50];
-        this.gameState = true // alive = true, dead = false
-        
+        this.gameState = 'playing' // playing, death, deathScreen
+        // this.input = new InputHandler();
         
         document.addEventListener('keydown', event => {
             if (event.code === 'Space'){
@@ -31,35 +32,33 @@ class Game{
         for(let i = 0; i < this.nPlat; i++){
             this.addPlatform(i);
         }
-        
         this.score = 0;
         this.player = new Player();
-        this.gameState = true;
+        this.gameState = 'playing';
+    }
+
+    run(){
+        switch(this.gameState){
+            case 'playing':
+                this.draw();
+                break
+            case 'death':
+                this.death();
+                break
+            case 'deathScreen':
+                this.deathScreen();
+                break
+        }
     }
 
     draw(){
         bg();
-        // if(this.gameState){
-            // draw ball
-            this.player.draw();
-            // Draw Stairs
-            this.drawStairs();
-            // Draw Score
-            this.drawScore();
-        // }else{
-            // do death stuff
-        //     console.log("made it here")
-        //     if(this.player.actualPos[1] < canvas.height+(this.player.rad*2)){
-        //         bg();
-        //         // this.drawStairs();
-        //         // this.player.draw();
-        //         // this.player.speed += 0.01;
-        //         // this.player.actualPos[1] += this.player.speed;
-        //     }else{
-        //         console.log('done');
-        //         this.death();
-        //     }
-        // }
+        // draw ball
+        this.player.draw();
+        // Draw Stairs
+        this.drawStairs();
+        // Draw Score
+        this.drawScore();
     }
 
     drawStairs(){
@@ -76,7 +75,7 @@ class Game{
         c.font = '30px sans-serif';
         c.textAlign = "center";
         c.fillStyle = '#ffffff';
-        c.fillText(`Score: ${this.score}`, x, y);
+        c.fillText(`Score:\n ${this.score}`, x, y);
 
     }
 
@@ -86,11 +85,17 @@ class Game{
     }
 
     handleSpace(){
-        this.player.position[0] = this.player.position[0]+this.player.direction;
-        // this.player.position[1]++;
-        this.platforms.shift();
-        this.addPlatform(this.nPlat-1);
-        this.checkDeath();
+        if(this.gameState == 'playing'){
+            this.player.position[0] = this.player.position[0]+this.player.direction;
+            // this.player.position[1]++;
+            this.platforms.shift();
+            this.addPlatform(this.nPlat-1);
+            this.checkDeath();
+        }else if(this.gameState == 'deathScreen'){
+            this.init();
+        }else{
+
+        }
     }
     handleCtrl(){
         this.player.direction *= -1;
@@ -101,8 +106,8 @@ class Game{
     checkDeath(){
         if(this.player.position[0]!=this.platforms[0].num){
             console.log('dead!');
-            this.gameState = false;
-            this.death();
+            this.gameState = 'death';
+            console.log('game over!');
         }else{
             console.log('alive!');
             this.score++;
@@ -110,12 +115,39 @@ class Game{
     }
 
     death(){
-        console.log('game over!');
         // Animate death
-        // this.player.deathAnimation(this);
-        this.gameState = false;
-        this.player.isAnimatingDeath = true;
-        // this.init();
+        bg();
+        this.player.deathAnimation(this);
+        // this.player.actualPos[0] += 0.1;
+        // this.player.draw();
+        this.draw();
+    }
+
+    deathScreen(){
+        let w = 500;
+        let h = 300;
+        bg();
+        // c.fillStyle = '#000000cc';
+        // c.rect((canvas.width/2)-(w/2), (canvas.height/2)-(h/2), w,h);
+        // c.fill();
+        // c.strokeStyle = '#FFFFFFcc';
+        // c.stroke();
+        c.fillStyle = '#ffffff';
+        c.font = '40px sans-serif';
+        c.fillText("Game Over!", canvas.width/2, 200);
+        c.font = '28px sans-serif';
+        c.fillText(`Score:`, canvas.width/2, 300);
+        c.fillText(`${this.score}`, canvas.width/2, 340);
+        if(this.score > this.highScore){
+            this.highScore = this.score;
+            c.fillText("New High Score!:", canvas.width/2, 400);
+        }else{
+            c.fillText("High Score:", canvas.width/2, 400);
+        }
+        c.fillText(`${this.highScore}`, canvas.width/2, 440);
+        c.fillText("Press Space to Try Again", canvas.width/2, 600);
+
+        // c.fillText();
     }
 
 }
@@ -143,40 +175,42 @@ class Player{
         this.actualPos = [400,600];
         this.direction = -1;
         this.speed = 0;
-        this.isAnimatingDeath = false;
     }
 
     draw(){
         c.fillStyle = this.color;
+        c.beginPath();
         c.ellipse(this.actualPos[0],this.actualPos[1]-(this.rad), this.rad,this.rad,0,0,2*Math.PI);
         c.fill();
         //maybe add a face to it for direction or maybe dont for more fun and dificulty
     }
 
-    // deathAnimation(game){
-    //     let speed = 0;
-    //     while(this.actualPos[1] < canvas.height+(this.rad*2)){
-    //         bg();
-    //         game.drawStairs();
-    //         speed += 0.0001;
-    //         this.actualPos[1] += speed;
-    //         this.draw();
-    //     }
-    //     console.log('done');
-    // }
-
     deathAnimation(game){
         if(this.actualPos[1] < canvas.height+(this.rad*2)){
             bg();
-            this.speed += 0.01;
+            this.speed += 0.05;
             this.actualPos[1] += this.speed;
-            this.draw();
         }else{
-            this.isAnimatingDeath = false;
+            game.gameState = 'deathScreen';
         }
     }
 
 
+}
+
+class InputHandler{
+    constructor(){
+        this.keys = [];
+        window.addEventListener('keydown', e => {
+            if ((   e.key === 'Space' ||
+                    e.key === 'Control' ||
+                    e.key === 'ArrowRight'
+                )&& this.keys.indexOf(e.key)=== -1){
+                    this.keys.push(e.key);
+                }
+            console.log(e.key, this.keys);
+        });
+    }
 }
 
 function random(a,b){
@@ -187,7 +221,6 @@ function randomOneOrMinusOne() {
     return Math.random() < 0.5 ? -1 : 1;
 }
   
-
 function bg(){
     c.fillStyle = '#181818';
     c.fillRect(0,0,canvas.width,canvas.height);
@@ -195,16 +228,10 @@ function bg(){
 }
 
 function loop(){
-    if(main.gameState == false && main.player.isAnimatingDeath){
-        console.log("doing death stuff")
-        main.player.deathAnimation(main);
-    }else{
-        main.draw();
-    }
+    main.run();
     requestAnimationFrame(loop);
 }
 
 let main = new Game();
-
 main.init();
 loop();
