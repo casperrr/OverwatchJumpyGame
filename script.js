@@ -185,11 +185,18 @@ class Player{
     }
 
     draw(){
+        let eyePos = [this.actualPos[0],this.actualPos[1]-this.rad];
+        let eyeOffSet = [this.rad/2*this.direction,-this.rad/3];
         c.fillStyle = this.color;
         c.beginPath();
         c.ellipse(this.actualPos[0],this.actualPos[1]-(this.rad), this.rad,this.rad,0,0,2*Math.PI);
         c.fill();
-        //maybe add a face to it for direction or maybe dont for more fun and dificulty
+        //draw eyes
+        c.fillStyle = '#000000';
+        c.beginPath();
+        c.ellipse(eyePos[0]+eyeOffSet[0],eyePos[1]+eyeOffSet[1], 5, 5, 0,0,Math.PI*2);
+        c.fill();
+
     }
 
     deathAnimation(game){
