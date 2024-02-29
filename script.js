@@ -16,6 +16,7 @@ class Game{
         this.gameState = 'playing' // playing, death, deathScreen
         // this.input = new InputHandler();
         this.platUnderPlayer = 4;
+        this.globalOffset = [0,0];
         
         document.addEventListener('keydown', event => {
             if (event.code === 'Space'){
@@ -68,14 +69,20 @@ class Game{
     }
 
     drawStairs(){
+        this.globalOffset[0] = this.lerp(this.globalOffset[0],0,0.1);
+        this.globalOffset[1] = this.lerp(this.globalOffset[1],0,0.1);
+
         this.platforms.forEach((p,i) => {
             if(p != null){
                 p.draw(
-                    (canvas.width/2)+(this.platSpacing[0]*(p.num-this.player.position[0])),
-                    600+(this.platSpacing[1]*(-i+this.player.position[1]+this.platUnderPlayer)));   
+                    (canvas.width/2)+(this.platSpacing[0]*(p.num-this.player.position[0]))+this.globalOffset[0],
+                    600+(this.platSpacing[1]*(-i+this.player.position[1]+this.platUnderPlayer))+this.globalOffset[1]);
+                    
+                // p.draw(this.lerp((canvas.width/2),(canvas.width/2)+(this.platSpacing[0]*(p.num-this.player.position[0])),0.5),600+(this.platSpacing[1]*(-i+this.player.position[1]+this.platUnderPlayer)));
             }
         });
     }
+    // When space is pressed then do the usual stuff but add an offset of the platform that was removed and then lerp to the correct position. use lerp having for example x,target,0.1 and use x in lerp and out of lerp.
 
     drawScore(){
         let x = canvas.width/2;
@@ -93,7 +100,8 @@ class Game{
     }
 
     addPlatform(i){
-        let lr = randomOneOrMinusOne();
+        // let lr = randomOneOrMinusOne();
+        let lr = -1;
         this.platforms.push(new Platform(lr, i<this.platUnderPlayer+1?0:this.platforms[i-1].num+lr));
     }
 
@@ -103,7 +111,12 @@ class Game{
             // this.player.position[1]++;
             this.platforms.shift();
             this.addPlatform(this.nPlat-1);
+            this.globalOffset = [this.platSpacing[0]*this.player.direction,-this.platSpacing[1]];
             this.checkDeath();
+            
+            // // this.player.position[0] = this.player.position[0]+this.player.direction;
+            // this.player.posOffset = [this.player.direction*this.platSpacing[0],this.platSpacing[1]]
+
         }else if(this.gameState == 'deathScreen'){
             if(this.score > this.highScore){
                 this.highScore = this.score;
@@ -158,14 +171,17 @@ class Game{
         c.fillText("Press Space to Try Again", canvas.width/2, 600);
     }
 
+    lerp(a,b,t){
+        return a+(b-a)*t;
+    }
+
 }
 
 class Platform{
     constructor(lr, num){
-        // this.lr = lr == 1? 1 : -1;
         this.lr = lr;
         this.num = num;
-        this.size = [50,5];
+        this.size = [80,5];
         this.color = '#f0f0f0';
     }
 
@@ -183,6 +199,7 @@ class Player{
         this.actualPos = [400,600];
         this.direction = -1;
         this.speed = 0;
+        this.posOffset = [0,0];
     }
 
     draw(){
@@ -190,19 +207,17 @@ class Player{
         let eyeOffSet = [this.rad/2*this.direction,-this.rad/3];
         c.fillStyle = this.color;
         c.beginPath();
-        c.ellipse(this.actualPos[0],this.actualPos[1]-(this.rad), this.rad,this.rad,0,0,2*Math.PI);
+        c.ellipse(this.actualPos[0]+this.posOffset[0],this.actualPos[1]-(this.rad)-this.posOffset[1], this.rad,this.rad,0,0,2*Math.PI);
         c.fill();
         //draw eyes
-        c.fillStyle = '#000000';
-        c.beginPath();
-        c.ellipse(eyePos[0]+eyeOffSet[0],eyePos[1]+eyeOffSet[1], 5, 5, 0,0,Math.PI*2);
-        c.fill();
-        c.fillStyle = '#eeeeee';
-        c.beginPath();
-        c.ellipse(eyePos[0]+eyeOffSet[0]+this.direction,eyePos[1]+eyeOffSet[1]-1, 1, 1, 0,0,Math.PI*2);
-        c.fill();
-        
-
+        // c.fillStyle = '#000000';
+        // c.beginPath();
+        // c.ellipse(eyePos[0]+eyeOffSet[0],eyePos[1]+eyeOffSet[1], 5, 5, 0,0,Math.PI*2);
+        // c.fill();
+        // c.fillStyle = '#eeeeee';
+        // c.beginPath();
+        // c.ellipse(eyePos[0]+eyeOffSet[0]+this.direction,eyePos[1]+eyeOffSet[1]-1, 1, 1, 0,0,Math.PI*2);
+        // c.fill();
     }
 
     deathAnimation(game){
