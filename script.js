@@ -16,6 +16,7 @@ class Game{
         this.gameState = 'playing' // playing, death, deathScreen
         // this.input = new InputHandler();
         this.platUnderPlayer = 4;
+        this.globalOffset = [0,0];
         
         document.addEventListener('keydown', event => {
             if (event.code === 'Space'){
@@ -60,7 +61,7 @@ class Game{
     draw(){
         bg();
         // draw ball
-        this.player.draw();
+        this.player.draw(this.globalOffset);
         // Draw Stairs
         this.drawStairs();
         // Draw Score
@@ -68,15 +69,18 @@ class Game{
     }
 
     drawStairs(){
+        let lerpAmount = 0.01;
+        this.globalOffset[0] = this.lerp(this.globalOffset[0],0,lerpAmount);
+        this.globalOffset[1] = this.lerp(this.globalOffset[1],0,lerpAmount);
+
         this.platforms.forEach((p,i) => {
             if(p != null){
                 p.draw(
-                    (canvas.width/2)+(this.platSpacing[0]*(p.num-this.player.position[0])),
-                    600+(this.platSpacing[1]*(-i+this.player.position[1]+this.platUnderPlayer)));   
+                    (canvas.width/2)+(this.platSpacing[0]*(p.num-this.player.position[0]))+this.globalOffset[0],
+                    600+(this.platSpacing[1]*(-i+this.player.position[1]+this.platUnderPlayer))+this.globalOffset[1]);
             }
         });
     }
-
     drawScore(){
         let x = canvas.width/2;
         let y = 100;
@@ -94,6 +98,7 @@ class Game{
 
     addPlatform(i){
         let lr = randomOneOrMinusOne();
+        // let lr = -1;
         this.platforms.push(new Platform(lr, i<this.platUnderPlayer+1?0:this.platforms[i-1].num+lr));
     }
 
@@ -103,15 +108,15 @@ class Game{
             // this.player.position[1]++;
             this.platforms.shift();
             this.addPlatform(this.nPlat-1);
+            this.globalOffset[0] += this.platSpacing[0]*this.player.direction;
+            this.globalOffset[1] += -this.platSpacing[1];
             this.checkDeath();
         }else if(this.gameState == 'deathScreen'){
             if(this.score > this.highScore){
                 this.highScore = this.score;
             }
             this.init();
-        }else{
-
-        }
+        }else{}
     }
     handleCtrl(){
         this.player.direction *= -1;
@@ -158,14 +163,17 @@ class Game{
         c.fillText("Press Space to Try Again", canvas.width/2, 600);
     }
 
+    lerp(a,b,t){
+        return a+(b-a)*t;
+    }
+
 }
 
 class Platform{
     constructor(lr, num){
-        // this.lr = lr == 1? 1 : -1;
         this.lr = lr;
         this.num = num;
-        this.size = [50,5];
+        this.size = [80,5];
         this.color = '#f0f0f0';
     }
 
@@ -185,24 +193,22 @@ class Player{
         this.speed = 0;
     }
 
-    draw(){
+    draw(off){
         let eyePos = [this.actualPos[0],this.actualPos[1]-this.rad];
         let eyeOffSet = [this.rad/2*this.direction,-this.rad/3];
         c.fillStyle = this.color;
         c.beginPath();
-        c.ellipse(this.actualPos[0],this.actualPos[1]-(this.rad), this.rad,this.rad,0,0,2*Math.PI);
+        c.ellipse(this.actualPos[0]+off[0],this.actualPos[1]-(this.rad)+off[1], this.rad,this.rad,0,0,2*Math.PI);
         c.fill();
         //draw eyes
         c.fillStyle = '#000000';
         c.beginPath();
-        c.ellipse(eyePos[0]+eyeOffSet[0],eyePos[1]+eyeOffSet[1], 5, 5, 0,0,Math.PI*2);
+        c.ellipse(eyePos[0]+eyeOffSet[0]+off[0],eyePos[1]+eyeOffSet[1]+off[1], 5, 5, 0,0,Math.PI*2);
         c.fill();
         c.fillStyle = '#eeeeee';
         c.beginPath();
-        c.ellipse(eyePos[0]+eyeOffSet[0]+this.direction,eyePos[1]+eyeOffSet[1]-1, 1, 1, 0,0,Math.PI*2);
+        c.ellipse(eyePos[0]+eyeOffSet[0]+this.direction+off[0],eyePos[1]+eyeOffSet[1]-1+off[1], 1, 1, 0,0,Math.PI*2);
         c.fill();
-        
-
     }
 
     deathAnimation(game){

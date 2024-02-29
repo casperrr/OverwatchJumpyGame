@@ -1,0 +1,9 @@
+- Add a scroller to make it have time preasure so you dont fall off the edge of the screen
+- Add a timer or some way to factor in time to the score
+- Add a leaderboard with everyone on
+- Add some skins
+- Add a way for the level to change at a certain height or something
+- Add like a mode for sprint to 100 or something in the shortest time
+- add a seed for random generation
+- see what you can do for animations (in the overwatch one it like smoothly follows the player, gosh that will take a whole redesign)
+- make an autoplay function that checks player direction and the next platform lr if they are == then call handleSpace() if not then call handlCtrl()
