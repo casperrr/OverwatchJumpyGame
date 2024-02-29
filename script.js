@@ -78,8 +78,6 @@ class Game{
                 p.draw(
                     (canvas.width/2)+(this.platSpacing[0]*(p.num-this.player.position[0]))+this.globalOffset[0],
                     600+(this.platSpacing[1]*(-i+this.player.position[1]+this.platUnderPlayer))+this.globalOffset[1]);
-                    
-                // p.draw(this.lerp((canvas.width/2),(canvas.width/2)+(this.platSpacing[0]*(p.num-this.player.position[0])),0.5),600+(this.platSpacing[1]*(-i+this.player.position[1]+this.platUnderPlayer)));
             }
         });
     }
@@ -203,14 +201,14 @@ class Player{
         c.ellipse(this.actualPos[0]+off[0],this.actualPos[1]-(this.rad)+off[1], this.rad,this.rad,0,0,2*Math.PI);
         c.fill();
         //draw eyes
-        // c.fillStyle = '#000000';
-        // c.beginPath();
-        // c.ellipse(eyePos[0]+eyeOffSet[0],eyePos[1]+eyeOffSet[1], 5, 5, 0,0,Math.PI*2);
-        // c.fill();
-        // c.fillStyle = '#eeeeee';
-        // c.beginPath();
-        // c.ellipse(eyePos[0]+eyeOffSet[0]+this.direction,eyePos[1]+eyeOffSet[1]-1, 1, 1, 0,0,Math.PI*2);
-        // c.fill();
+        c.fillStyle = '#000000';
+        c.beginPath();
+        c.ellipse(eyePos[0]+eyeOffSet[0]+off[0],eyePos[1]+eyeOffSet[1]+off[1], 5, 5, 0,0,Math.PI*2);
+        c.fill();
+        c.fillStyle = '#eeeeee';
+        c.beginPath();
+        c.ellipse(eyePos[0]+eyeOffSet[0]+this.direction+off[0],eyePos[1]+eyeOffSet[1]-1+off[1], 1, 1, 0,0,Math.PI*2);
+        c.fill();
     }
 
     deathAnimation(game){
