@@ -8,14 +8,14 @@ class Game{
         this.score = 0;
         let storedHighScore = localStorage.getItem('highScore'); 
         this.highScore = storedHighScore == null?0:storedHighScore;
-        this.nPlat = 15;
+        this.nPlat = 20;
         this.platforms = [];
         this.player;
         this.playerColor = '#FF00AA';
         this.platSpacing = [70,50];
         this.gameState = 'playing' // playing, death, deathScreen
         // this.input = new InputHandler();
-        this.platUnderPlayer = 4;
+        this.platUnderPlayer = 8;
         this.globalOffset = [0,0];
         
         document.addEventListener('keydown', event => {
@@ -66,6 +66,9 @@ class Game{
         this.drawStairs();
         // Draw Score
         this.drawScore();
+        //debug line
+        // c.fillStyle = '#ff0000';
+        // c.fillRect(0,canvas.height-2,canvas.width,20);
     }
 
     drawStairs(){
@@ -173,7 +176,7 @@ class Platform{
     constructor(lr, num){
         this.lr = lr;
         this.num = num;
-        this.size = [80,5];
+        this.size = [70,5];
         this.color = '#f0f0f0';
     }
 
