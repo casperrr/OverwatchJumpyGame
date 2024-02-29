@@ -40,7 +40,8 @@ class Game{
             }
         }
         this.score = 0;
-        this.player = new Player();
+        // this.player = new Player();
+        this.player = new PlayerImage('/assets/Haz.png');
         this.gameState = 'playing';
     }
 
@@ -68,7 +69,7 @@ class Game{
         this.drawScore();
         //debug line
         // c.fillStyle = '#ff0000';
-        // c.fillRect(0,canvas.height-2,canvas.width,20);
+        // c.fillRect(0,canvas.height*0.75,canvas.width,20);
     }
 
     drawStairs(){
@@ -80,10 +81,12 @@ class Game{
             if(p != null){
                 p.draw(
                     (canvas.width/2)+(this.platSpacing[0]*(p.num-this.player.position[0]))+this.globalOffset[0],
-                    600+(this.platSpacing[1]*(-i+this.player.position[1]+this.platUnderPlayer))+this.globalOffset[1]);
+                    (canvas.height*0.75)+(this.platSpacing[1]*(-i+this.player.position[1]+this.platUnderPlayer))+this.globalOffset[1]);
             }
         });
     }
+// Use global offset to do the paralax background
+
     drawScore(){
         let x = canvas.width/2;
         let y = 100;
@@ -191,11 +194,10 @@ class Player{
         this.color = '#FF00AA';
         this.rad = 20;
         this.position = [0,0];
-        this.actualPos = [400,600];
+        this.actualPos = [canvas.width/2,canvas.height*0.75];
         this.direction = -1;
         this.speed = 0;
     }
-
     draw(off){
         let eyePos = [this.actualPos[0],this.actualPos[1]-this.rad];
         let eyeOffSet = [this.rad/2*this.direction,-this.rad/3];
@@ -223,8 +225,22 @@ class Player{
             game.gameState = 'deathScreen';
         }
     }
+}
 
+class PlayerImage extends Player{
+    constructor(img){
+        super();
+        this.image = new Image();
+        this.image.src = img;
+    }
 
+    draw(off){
+        c.save();
+        c.translate(this.actualPos[0]-(-this.direction*((this.image.width/2)-10)-(off[0])),this.actualPos[1]-(this.image.height-12)+off[1])
+        c.scale(-this.direction,1)// flip here 
+        c.drawImage(this.image,0,0);
+        c.restore();
+    }
 }
 
 class InputHandler{
