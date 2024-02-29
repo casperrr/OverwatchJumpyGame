@@ -61,7 +61,7 @@ class Game{
     draw(){
         bg();
         // draw ball
-        this.player.draw();
+        this.player.draw(this.globalOffset);
         // Draw Stairs
         this.drawStairs();
         // Draw Score
@@ -69,8 +69,9 @@ class Game{
     }
 
     drawStairs(){
-        this.globalOffset[0] = this.lerp(this.globalOffset[0],0,0.1);
-        this.globalOffset[1] = this.lerp(this.globalOffset[1],0,0.1);
+        let lerpAmount = 0.01;
+        this.globalOffset[0] = this.lerp(this.globalOffset[0],0,lerpAmount);
+        this.globalOffset[1] = this.lerp(this.globalOffset[1],0,lerpAmount);
 
         this.platforms.forEach((p,i) => {
             if(p != null){
@@ -82,8 +83,6 @@ class Game{
             }
         });
     }
-    // When space is pressed then do the usual stuff but add an offset of the platform that was removed and then lerp to the correct position. use lerp having for example x,target,0.1 and use x in lerp and out of lerp.
-
     drawScore(){
         let x = canvas.width/2;
         let y = 100;
@@ -100,8 +99,8 @@ class Game{
     }
 
     addPlatform(i){
-        // let lr = randomOneOrMinusOne();
-        let lr = -1;
+        let lr = randomOneOrMinusOne();
+        // let lr = -1;
         this.platforms.push(new Platform(lr, i<this.platUnderPlayer+1?0:this.platforms[i-1].num+lr));
     }
 
@@ -111,20 +110,15 @@ class Game{
             // this.player.position[1]++;
             this.platforms.shift();
             this.addPlatform(this.nPlat-1);
-            this.globalOffset = [this.platSpacing[0]*this.player.direction,-this.platSpacing[1]];
+            this.globalOffset[0] += this.platSpacing[0]*this.player.direction;
+            this.globalOffset[1] += -this.platSpacing[1];
             this.checkDeath();
-            
-            // // this.player.position[0] = this.player.position[0]+this.player.direction;
-            // this.player.posOffset = [this.player.direction*this.platSpacing[0],this.platSpacing[1]]
-
         }else if(this.gameState == 'deathScreen'){
             if(this.score > this.highScore){
                 this.highScore = this.score;
             }
             this.init();
-        }else{
-
-        }
+        }else{}
     }
     handleCtrl(){
         this.player.direction *= -1;
@@ -199,15 +193,14 @@ class Player{
         this.actualPos = [400,600];
         this.direction = -1;
         this.speed = 0;
-        this.posOffset = [0,0];
     }
 
-    draw(){
+    draw(off){
         let eyePos = [this.actualPos[0],this.actualPos[1]-this.rad];
         let eyeOffSet = [this.rad/2*this.direction,-this.rad/3];
         c.fillStyle = this.color;
         c.beginPath();
-        c.ellipse(this.actualPos[0]+this.posOffset[0],this.actualPos[1]-(this.rad)-this.posOffset[1], this.rad,this.rad,0,0,2*Math.PI);
+        c.ellipse(this.actualPos[0]+off[0],this.actualPos[1]-(this.rad)+off[1], this.rad,this.rad,0,0,2*Math.PI);
         c.fill();
         //draw eyes
         // c.fillStyle = '#000000';
