@@ -12,7 +12,7 @@ class Game{
         this.platforms = [];
         this.player;
         this.playerColor = '#FF00AA';
-        this.platSpacing = [70,50];
+        this.platSpacing = [75,50];
         this.gameState = 'playing' // playing, death, deathScreen
         // this.input = new InputHandler();
         this.platUnderPlayer = 8;
