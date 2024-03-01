@@ -41,7 +41,7 @@ class Game{
         }
         this.score = 0;
         // this.player = new Player();
-        this.player = new PlayerImage('/assets/Haz.png');
+        this.player = new PlayerImage('./assets/Haz.png');
         this.gameState = 'playing';
     }
 
